@@ -21,12 +21,20 @@ var eye;
 var target;
 var up;
 
+var moveSpeed = 0.25
+
 var program;
 
-var x,y,z
-x = -2.0
-y = 2.0
-z = 2.0
+var eye_x,eye_y,eye_z
+eye_x = -2.0
+eye_y = 2.0
+eye_z = 2.0
+
+var target_x, target_y,target_z
+target_x = 0
+target_y = 0
+target_z = 0
+
 window.onload = function init()
 {
 	// Get canvas and setup webGL
@@ -185,8 +193,8 @@ window.onload = function init()
 
     // Set view matrix
 	//
-	eye = vec3.fromValues(x, y, z);
-	target = vec3.fromValues(0.0, 0.0, 0.0);
+	eye = vec3.fromValues(eye_x, eye_y, eye_z);
+	target = vec3.fromValues(eye_x, eye_y, eye_z);
 	up = vec3.fromValues(0.0, 1.0, 0.0);
 
 	viewMatrix = mat4.create();
@@ -208,8 +216,8 @@ window.onload = function init()
 
 function render()
 {
-	eye = vec3.fromValues(x, y, z);
-	target = vec3.fromValues(0.0, 0.0, 0.0);
+	eye = vec3.fromValues(eye_x, eye_y, eye_z);
+	target = vec3.fromValues(eye_x, eye_y, eye_z);
 	up = vec3.fromValues(0.0, 1.0, 0.0);
 
 	viewMatrix = mat4.create();
@@ -251,12 +259,14 @@ function eventHandling(e)
 
 function moveFoward()
 {
-	x = x-0.1*((1/Math.abs(x))*x)
+	eye_z = eye_z- moveSpeed *((1/Math.abs(eye_z))*eye_z)
+	target_z = target_z- moveSpeed * ((1/Math.abs(target_z))*target_z)
 }
 
 function moveBack()
 {
-	x = x+0.1*((1/Math.abs(x))*x)
+	eye_z = eye_z+ moveSpeed *((1/Math.abs(eye_z))*eye_z)
+	target_z = target_z+ moveSpeed * ((1/Math.abs(target_z))*target_z)
 }
 
 function moveLeft()
