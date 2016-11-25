@@ -16,6 +16,9 @@ var viewMatrix;
 var projectionMatrixLoc;
 var projectionMatrix;
 
+var camAlign;
+var moveSpeed = 0.25;
+
 //KamaraPosition
 var eye;
 var target;
@@ -250,22 +253,25 @@ function eventHandling(e)
 
 function moveFoward()
 {
-	x = x-0.1*((1/Math.abs(x))*x)
+	eye[2] = eye[2] - moveSpeed * ((1/Math.abs(x))*x)
+	target[2] = target[2] - moveSpeed * ((1/Math.abs(x))*x)
 }
 
 function moveBack()
 {
-	x = x+0.1*((1/Math.abs(x))*x)
+	eye[2] = eye[2] + moveSpeed * ((1/Math.abs(x))*x)
+	target[2] = target[2] + moveSpeed * ((1/Math.abs(x))*x)
 }
 
 function moveLeft()
 {
-	z = z+0,1
+	x = x+0,1
+	
 }
 
 function moveRight()
 {
-	z = z-0.1
+	x = x-0.1
 }
 
 
