@@ -280,12 +280,37 @@ function moveRight()
 	z = z-0.1*((1/Math.abs(z))*z)
 }
 
+function getEyeAngles()
+{
+ 	//alert("gea")
+ 	var delta_x, delta_y, delta_z
+ 	var angXZ, angYZ, angXY
+
+ delta_x = eye_x - target_x;
+ delta_y = eye_y - target_y;
+ delta_z = eye_z - target_z;
+ //alert("test")
+ angXZ = Math.atan(delta_x/delta_z)
+ angYZ = Math.atan(delta_y/delta_z)
+ //alert("before if")
+ if (delta_x != 0)
+ {
+  angXY = Math.atan(delta_y/delta_x)
+ }
+ else
+ {
+  angXY = Math.atan(0)
+ }
+ //alert("deltas: " + delta_x + delta_y + delta_z)
+ //alert("XY = " + angXY + ", YZ = " + angYZ + ", XZ = " + angXZ);
+}
 
 function canvasCoords()
 {
 	canvasText = document.getElementById("text-canvas");
 	var ctx= canvasText.getContext("2d");
 	ctx.font="12px Georgia";
+	ctx.fillStyle = 'white';
 	ctx.fillText("Kamera: ",0,10);
 	ctx.fillText("x = " + eye_x ,0,20);
 	ctx.fillText("y = " + eye_y  + "",0,30);
