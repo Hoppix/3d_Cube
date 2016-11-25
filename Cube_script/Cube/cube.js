@@ -1,5 +1,6 @@
 var gl;
 var canvas;
+var canvasText;
 
 var positions;
 var colors;
@@ -31,14 +32,13 @@ eye_y = 2.0
 eye_z = 2.0
 
 var target_x, target_y,target_z
-target_x = 0
-target_y = 0
-target_z = 0
+target_x = 0.0
+target_y = 0.0
+target_z = 0.0
 
 window.onload = function init()
 {
 	// Get canvas and setup webGL
-
 	canvas = document.getElementById("gl-canvas");
 	gl = WebGLUtils.setupWebGL(canvas);
 	window.addEventListener("keypress", eventHandling);
@@ -211,13 +211,14 @@ window.onload = function init()
 	projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 	gl.uniformMatrix4fv(projectionMatrixLoc, false, projectionMatrix);
 
+	canvasCoords();
 	render();
 };
 
 function render()
 {
 	eye = vec3.fromValues(eye_x, eye_y, eye_z);
-	target = vec3.fromValues(eye_x, eye_y, eye_z);
+	target = vec3.fromValues(target_x, target_y, target_z);
 	up = vec3.fromValues(0.0, 1.0, 0.0);
 
 	viewMatrix = mat4.create();
@@ -277,4 +278,25 @@ function moveLeft()
 function moveRight()
 {
 	z = z-0.1*((1/Math.abs(z))*z)
+}
+
+
+function canvasCoords()
+{
+	canvasText = document.getElementById("text-canvas");
+	var ctx= canvasText.getContext("2d");
+	ctx.font="12px Georgia";
+	ctx.fillText("Kamera: ",0,10);
+	ctx.fillText("x = " + eye_x ,0,20);
+	ctx.fillText("y = " + eye_y  + "",0,30);
+	ctx.fillText("z = " + eye_z + "",0,40);
+
+
+}
+
+function coordsClear()
+{
+	canvasText = document.getElementById("text-canvas");
+	var ctx=canvasText.getContext("2d");
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
