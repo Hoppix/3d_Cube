@@ -28,8 +28,8 @@ var program;
 
 var eye_x,eye_y,eye_z
 eye_x = -2.0
-eye_y = 2.0
-eye_z = 2.0
+eye_y = -2.0
+eye_z = -2.0
 
 var target_x, target_y,target_z
 target_x = 0.0
@@ -217,6 +217,7 @@ window.onload = function init()
 
 function render()
 {
+	canvasCoords();
 	eye = vec3.fromValues(eye_x, eye_y, eye_z);
 	target = vec3.fromValues(target_x, target_y, target_z);
 	up = vec3.fromValues(0.0, 1.0, 0.0);
@@ -260,19 +261,75 @@ function eventHandling(e)
 
 function moveFoward()
 {
-	eye_z = eye_z- moveSpeed *((1/Math.abs(eye_z))*eye_z)
-	target_z = target_z- moveSpeed //* ((1/Math.abs(target_z))*target_z)
+	//alert(getEyeAngleYZ());
+	//r(-r)*r(-b)*r(-a)*t(-eye)*(strafe, up, -look, 1)
+	var signX = -1, signY=-1, signZ=-1
+	if(eye_x >= 0)
+	{
+		signX = 1
+	}
+	if(eye_y >= 0)
+	{
+		signY = 1
+	}
+	if(eye_z >= 0)
+	{
+		signZ = 1
+	}
+	eye_x = eye_x - Math.sin(getEyeAngleXZ(0)) * moveSpeed * signX
+	eye_y = eye_y - Math.sin(getEyeAngleYZ(0)) * moveSpeed * signY
+	eye_z = eye_z - Math.sin(getEyeAngleXY(0)) * moveSpeed * signZ
+	target_x = target_x - Math.sin(getEyeAngleXZ(0)) * moveSpeed * signX
+	target_y = target_y - Math.sin(getEyeAngleYZ(0)) * moveSpeed * signY
+	target_z = target_z - Math.sin(getEyeAngleXY(0)) * moveSpeed * signZ
 }
 
 function moveBack()
 {
-	eye_z = eye_z+ moveSpeed *((1/Math.abs(eye_z))*eye_z)
-	target_z = target_z+ moveSpeed //* ((1/Math.abs(target_z))*target_z)
+	//alert(getEyeAngleYZ());
+	//r(-r)*r(-b)*r(-a)*t(-eye)*(strafe, up, -look, 1)
+	var signX = -1, signY=-1, signZ=-1
+	if(eye_x >= 0)
+	{
+		signX = 1
+	}
+	if(eye_y >= 0)
+	{
+		signY = 1
+	}
+	if(eye_z >= 0)
+	{
+		signZ = 1
+	}
+	eye_x = eye_x + Math.sin(getEyeAngleXZ(0)) * moveSpeed * signX
+	eye_y = eye_y + Math.sin(getEyeAngleYZ(0)) * moveSpeed * signY
+	eye_z = eye_z + Math.sin(getEyeAngleXY(0)) * moveSpeed * signZ
+	target_x = target_x + Math.sin(getEyeAngleXZ(0)) * moveSpeed * signX
+	target_y = target_y + Math.sin(getEyeAngleYZ(0)) * moveSpeed * signY
+	target_z = target_z + Math.sin(getEyeAngleXY(0)) * moveSpeed * signZ
 }
 
 function moveLeft()
 {
-	z =z+0.1*((1/Math.abs(z))*z)
+	var signX = -1, signY=-1, signZ=-1
+	if(eye_x >= 0)
+	{
+		signX = 1
+	}
+	if(eye_y >= 0)
+	{
+		signY = 1
+	}
+	if(eye_z >= 0)
+	{
+		signZ = 1
+	}
+	eye_x = eye_x + Math.sin(getEyeAngleXZ(degreeToRadian(90))) * moveSpeed * signX
+	eye_y = eye_y + Math.sin(getEyeAngleYZ(degreeToRadian(90))) * moveSpeed * signY
+	eye_z = eye_z + Math.sin(getEyeAngleXY(degreeToRadian(90))) * moveSpeed * signZ
+	target_x = target_x + Math.sin(getEyeAngleXZ(degreeToRadian(90))) * moveSpeed * signX
+	target_y = target_y + Math.sin(getEyeAngleYZ(degreeToRadian(90))) * moveSpeed * signY
+	target_z = target_z + Math.sin(getEyeAngleXY(degreeToRadian(90))) * moveSpeed * signZ
 }
 
 function moveRight()
@@ -307,6 +364,52 @@ function getEyeAngles()
 
 }
 
+function getEyeAngleXZ(offset)
+{
+		var delta_x, delta_y, delta_z
+		var angXZ
+
+		delta_x = eye_x - target_x;
+		delta_z = eye_z - target_z;
+		
+		angXZ = Math.atan(delta_x/delta_z + offset)
+		
+		return angXZ;
+}
+
+function getEyeAngleXY(offset)
+{
+		var delta_x, delta_y
+		var angXY
+
+		delta_x = eye_x - target_x;
+		delta_y = eye_y - target_y;
+		
+		if (delta_x != 0)
+		{
+			angXY = Math.atan(delta_y/delta_x + offset)
+		}
+		else
+		{
+			angXY = Math.atan(0)
+		}
+		
+		return angXY;
+}
+
+function getEyeAngleYZ(offset)
+{
+		var delta_y, delta_z
+		var angYZ
+
+		delta_y = eye_y - target_y;
+		delta_z = eye_z - target_z;
+		
+		angYZ = Math.atan(delta_y/delta_z + offset)
+		
+		return angYZ;
+}
+
 function canvasCoords()
 {
 	canvasText = document.getElementById("text-canvas");
@@ -326,4 +429,9 @@ function coordsClear()
 	canvasText = document.getElementById("text-canvas");
 	var ctx=canvasText.getContext("2d");
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function degreeToRadian(degrees)
+{
+	return (degrees/180) * Math.PI()
 }
