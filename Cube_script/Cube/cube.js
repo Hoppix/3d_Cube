@@ -261,13 +261,13 @@ function eventHandling(e)
 function moveFoward()
 {
 	eye_z = eye_z- moveSpeed *((1/Math.abs(eye_z))*eye_z)
-	target_z = target_z- moveSpeed * ((1/Math.abs(target_z))*target_z)
+	target_z = target_z- moveSpeed //* ((1/Math.abs(target_z))*target_z)
 }
 
 function moveBack()
 {
 	eye_z = eye_z+ moveSpeed *((1/Math.abs(eye_z))*eye_z)
-	target_z = target_z+ moveSpeed * ((1/Math.abs(target_z))*target_z)
+	target_z = target_z+ moveSpeed //* ((1/Math.abs(target_z))*target_z)
 }
 
 function moveLeft()
@@ -282,27 +282,25 @@ function moveRight()
 
 function getEyeAngles()
 {
- 	//alert("gea")
- 	var delta_x, delta_y, delta_z
- 	var angXZ, angYZ, angXY
+		//useless see glmatrix.net >_>
+		var delta_x, delta_y, delta_z
+		var angXZ, angYZ, angXY
 
- delta_x = eye_x - target_x;
- delta_y = eye_y - target_y;
- delta_z = eye_z - target_z;
- //alert("test")
- angXZ = Math.atan(delta_x/delta_z)
- angYZ = Math.atan(delta_y/delta_z)
- //alert("before if")
- if (delta_x != 0)
- {
-  angXY = Math.atan(delta_y/delta_x)
- }
- else
- {
-  angXY = Math.atan(0)
- }
- //alert("deltas: " + delta_x + delta_y + delta_z)
- //alert("XY = " + angXY + ", YZ = " + angYZ + ", XZ = " + angXZ);
+		delta_x = eye_x - target_x;
+		delta_y = eye_y - target_y;
+		delta_z = eye_z - target_z;
+		
+		angXZ = Math.atan(delta_x/delta_z)
+		angYZ = Math.atan(delta_y/delta_z)
+		
+		if (delta_x != 0)
+		{
+			angXY = Math.atan(delta_y/delta_x)
+		}
+		else
+		{
+			angXY = Math.atan(0)
+		}		
 }
 
 function canvasCoords()
