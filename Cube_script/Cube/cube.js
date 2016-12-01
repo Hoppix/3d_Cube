@@ -283,6 +283,7 @@ function moveRight()
 function getEyeAngles()
 {
 		//useless see glmatrix.net >_>
+		//korrekt impl siehe übung 		
 		var delta_x, delta_y, delta_z
 		var angXZ, angYZ, angXY
 
@@ -300,7 +301,10 @@ function getEyeAngles()
 		else
 		{
 			angXY = Math.atan(0)
-		}		
+		}
+		//TODO multiple return?
+		// r(-r)*r(-b)*r(-a)*t(-eye)*(strafe, up, -look, 1)
+
 }
 
 function canvasCoords()
