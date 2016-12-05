@@ -51,6 +51,15 @@ window.onload = function init()
 	//window.addEventListener("keydown", keyDown);
 	//window.addEventListener("keyup", keyUp);
 
+	canvas.requestPointerLock = canvas.requestPointerLock ||
+		canvas.mozRequestPointerLock;
+
+	document.exitPointerLock = document.exitPointerLock ||
+		document.mozExitPointerLock;
+
+	canvas.onclick = function() {
+		canvas.requestPointerLock();
+	}
 	if (!gl) { alert("WebGL isn't available"); }
 
 	// Specify position and color of the vertices
