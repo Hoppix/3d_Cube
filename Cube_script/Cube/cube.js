@@ -260,9 +260,9 @@ function eventHandling(e)
 
 function moveFoward()
 {
-  //ang = Y
-  // roll = z
-  // elev X
+    //ang = Y
+    // roll = z
+    // elev X
     eye_x += moveSpeed * Math.sin(getEyeAngleXZ(0) * Math.PI / 180.0);
     eye_x += moveSpeed * Math.sin(getEyeAngleXY(0) * Math.PI / 180.0);
     eye_y -= moveSpeed * Math.sin(getEyeAngleYZ(0) * Math.PI / 180.0);
