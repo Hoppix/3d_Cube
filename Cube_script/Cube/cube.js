@@ -60,9 +60,9 @@ window.onload = function init()
 	canvas = document.getElementById("gl-canvas");
 	gl = WebGLUtils.setupWebGL(canvas);
 	
-	window.addEventListener("keypress", eventHandling);	
-	//window.addEventListener("keydown", keyDown);
-	//window.addEventListener("keyup", keyUp);
+	//window.addEventListener("keypress", eventHandling);	
+	window.addEventListener("keydown", keyDown);
+	window.addEventListener("keyup", keyUp);
 	
 	if (!gl) { alert("WebGL isn't available"); }
 
@@ -215,15 +215,12 @@ window.onload = function init()
 
     // Set view matrix
 	//
-	eye = vec3.fromValues(eye_x, eye_y, eye_z);
-	target = vec3.fromValues(eye_x, eye_y, eye_z);
-	up = vec3.fromValues(0.0, 1.0, 0.0);
 
-	viewMatrix = mat4.create();
-	mat4.lookAt(viewMatrix, eye, target, up);
+	//viewMatrix = mat4.create();
+	//mat4.lookAt(viewMatrix, eye, target, up);
 
-	viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
-	gl.uniformMatrix4fv(viewMatrixLoc, false, viewMatrix);
+	//viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
+	//gl.uniformMatrix4fv(viewMatrixLoc, false, viewMatrix);
 
     // Set projection matrix
 	// Kamera
@@ -239,7 +236,7 @@ window.onload = function init()
 
 function render()
 {
-	//movement()
+	movement()
 	//canvasCoords();
 	//eye = vec3.fromValues(eye_x, eye_y, eye_z);
 	//target = vec3.fromValues(target_x, target_y, target_z);
@@ -264,14 +261,7 @@ function eventHandling(e)
 	switch(e.keyCode)
 	{
 		case 38:
-				var distance = vec3.create();
-			var rotatedTarget = vec3.create();
-			vec3.rotateY(rotatedTarget, target, eye, Math.PI/2);
-			vec3.sub(distance, rotatedTarget, eye);
-			vec3.normalize(distance, distance);
-			vec3.scale(distance, distance, 0.1);
-			vec3.add(eye, eye, distance);
-			vec3.add(target, target, distance);
+					mf2()
 					//moveFowardNew();
 					break;
 		case 37:
