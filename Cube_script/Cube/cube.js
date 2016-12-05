@@ -27,21 +27,43 @@ var target;
 var up;
 
 var eye_x,eye_y,eye_z
-eye_x = -2.0;
-eye_y = -2.0;
-eye_z = -2.0;
+eye_x = 0.0;
+eye_y = 0.0;
+eye_z = 2.0;
 
 var target_x, target_y,target_z
 target_x = 0.0;
 target_y = 0.0;
 target_z = 0.0;
 
+eye = vec3.fromValues(eye_x, eye_y, eye_z);
+target = vec3.fromValues(target_x, target_y, target_z);
+up = vec3.fromValues(0.0, 1.0, 0.0);
+
+//Isa Start
+var keys = [];
+
+function keyDown(e)
+{
+	keys[e.keyCode] = true;
+}
+
+function keyUp(e)
+{
+	keys[e.keyCode] = false;
+}
+//Isa End
+
 window.onload = function init()
 {
 	// Get canvas and setup webGL
 	canvas = document.getElementById("gl-canvas");
 	gl = WebGLUtils.setupWebGL(canvas);
-	window.addEventListener("keypress", eventHandling);
+	
+	window.addEventListener("keypress", eventHandling);	
+	//window.addEventListener("keydown", keyDown);
+	//window.addEventListener("keyup", keyUp);
+	
 	if (!gl) { alert("WebGL isn't available"); }
 
 	// Specify position and color of the vertices
@@ -217,10 +239,11 @@ window.onload = function init()
 
 function render()
 {
-	canvasCoords();
-	eye = vec3.fromValues(eye_x, eye_y, eye_z);
-	target = vec3.fromValues(target_x, target_y, target_z);
-	up = vec3.fromValues(0.0, 1.0, 0.0);
+	//movement()
+	//canvasCoords();
+	//eye = vec3.fromValues(eye_x, eye_y, eye_z);
+	//target = vec3.fromValues(target_x, target_y, target_z);
+	//up = vec3.fromValues(0.0, 1.0, 0.0);
 
 	viewMatrix = mat4.create();
 	mat4.lookAt(viewMatrix, eye, target, up);
@@ -241,7 +264,15 @@ function eventHandling(e)
 	switch(e.keyCode)
 	{
 		case 38:
-					moveFowardNew();
+				var distance = vec3.create();
+			var rotatedTarget = vec3.create();
+			vec3.rotateY(rotatedTarget, target, eye, Math.PI/2);
+			vec3.sub(distance, rotatedTarget, eye);
+			vec3.normalize(distance, distance);
+			vec3.scale(distance, distance, 0.1);
+			vec3.add(eye, eye, distance);
+			vec3.add(target, target, distance);
+					//moveFowardNew();
 					break;
 		case 37:
 					moveLeft();
@@ -259,6 +290,63 @@ function eventHandling(e)
 	}
 }
 
+function movement()
+{
+	if (keys[65]) // a 
+	{
+		var distance = vec3.create();
+		var rotatedTarget = vec3.create();
+		vec3.rotateY(rotatedTarget, target, eye, Math.PI/2);
+		vec3.sub(distance, rotatedTarget, eye);
+		vec3.normalize(distance, distance);
+		vec3.scale(distance, distance, 0.1);
+		vec3.add(eye, eye, distance);
+		vec3.add(target, target, distance);
+		
+	}
+	if (keys[68]) // d
+	{
+		var distance = vec3.create();
+		var rotatedTarget = vec3.create();
+		vec3.rotateY(rotatedTarget, target, eye, Math.PI*3/2);
+		vec3.sub(distance, rotatedTarget, eye);
+		vec3.normalize(distance, distance);
+		vec3.scale(distance, distance, 0.1);
+		vec3.add(eye, eye, distance);
+		vec3.add(target, target, distance);
+	}
+	if (keys[87]) // w
+	{
+		var distance = vec3.create();
+		vec3.sub(distance, target, eye);
+		vec3.normalize(distance, distance);
+		vec3.scale(distance, distance, 0.1);
+		vec3.add(eye, eye, distance);
+		vec3.add(target, target, distance);
+	}
+	if (keys[83]) // s
+	{
+		var distance = vec3.create();
+		vec3.sub(distance, target, eye);
+		vec3.normalize(distance, distance);
+		vec3.scale(distance, distance, 0.1);
+		vec3.sub(eye, eye, distance);
+		vec3.sub(target, target, distance);
+	}
+}
+
+function mf2()
+{
+	var distance = vec3.create();
+		var rotatedTarget = vec3.create();
+		vec3.rotateY(rotatedTarget, target, eye, Math.PI/2);
+		vec3.sub(distance, rotatedTarget, eye);
+		vec3.normalize(distance, distance);
+		vec3.scale(distance, distance, 0.1);
+		vec3.add(eye, eye, distance);
+		vec3.add(target, target, distance);
+		
+}
 function moveFoward()
 {
 	//Checken des Vorzeichens
