@@ -17,24 +17,24 @@ var viewMatrix;
 var projectionMatrixLoc;
 var projectionMatrix;
 
+var program;
+
+var moveSpeed = 0.25;
+
 //KamaraPosition
 var eye;
 var target;
 var up;
 
-var moveSpeed = 0.25
-
-var program;
-
 var eye_x,eye_y,eye_z
-eye_x = -2.0
-eye_y = -2.0
-eye_z = -2.0
+eye_x = -2.0;
+eye_y = -2.0;
+eye_z = -2.0;
 
 var target_x, target_y,target_z
-target_x = 0.0
-target_y = 0.0
-target_z = 0.0
+target_x = 0.0;
+target_y = 0.0;
+target_z = 0.0;
 
 window.onload = function init()
 {
@@ -191,7 +191,8 @@ window.onload = function init()
 	modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
 	gl.uniformMatrix4fv(modelMatrixLoc, false, modelMatrix);
 
-  // Set view matrix
+    // Set view matrix
+	//
 	eye = vec3.fromValues(eye_x, eye_y, eye_z);
 	target = vec3.fromValues(eye_x, eye_y, eye_z);
 	up = vec3.fromValues(0.0, 1.0, 0.0);
@@ -240,7 +241,7 @@ function eventHandling(e)
 	switch(e.keyCode)
 	{
 		case 38:
-					moveFoward();
+					moveFowardNew();
 					break;
 		case 37:
 					moveLeft();
@@ -260,21 +261,72 @@ function eventHandling(e)
 
 function moveFoward()
 {
-    //ang = Y
-    // roll = z
-    // elev X
-    eye_x += moveSpeed * Math.sin(getEyeAngleXZ(0) * Math.PI / 180.0);
-    eye_x += moveSpeed * Math.sin(getEyeAngleXY(0) * Math.PI / 180.0);
-    eye_y -= moveSpeed * Math.sin(getEyeAngleYZ(0) * Math.PI / 180.0);
-    eye_y += moveSpeed * Math.sin(getEyeAngleXY(0) * Math.PI / 180.0);
-    eye_z -= moveSpeed * Math.cos(getEyeAngleXZ(0) * Math.PI / 180.0);
-    eye_z -= moveSpeed * Math.cos(getEyeAngleYZ(0) * Math.PI / 180.0);
+	//Checken des Vorzeichens
+	var signX = -1, signY=-1, signZ=-1
+	if(eye_x >= 0)
+	{
+		signX = 1
+	}
+	if(eye_y >= 0)
+	{
+		signY = 1
+	}
+	if(eye_z >= 0)
+	{
+		signZ = 1
+	}
+
+	//Neue Position für die Kamera
+	eye_x = eye_x - Math.sin(getEyeAngleXZ(0)) * moveSpeed * signX
+	eye_y = eye_y - Math.sin(getEyeAngleYZ(0)) * moveSpeed * signY
+	eye_z = eye_z - Math.sin(getEyeAngleXY(0)) * moveSpeed * signZ
+	//Neue Position für das Ziel
+	target_x = target_x - Math.sin(getEyeAngleXZ(0)) * moveSpeed * signX
+	target_y = target_y - Math.sin(getEyeAngleYZ(0)) * moveSpeed * signY
+	target_z = target_z - Math.sin(getEyeAngleXY(0)) * moveSpeed * signZ
+}
+
+function moveFowardNew()
+{
+ var cosa, tanb, tanc //angles
+ var distX, distY, distZ //distanzen zum Target
+ var dx, dy, dz //distanzen zur zu gehenden Distanz
+ var signX = -1, signY=-1, signZ=-1 //das Vorzeichen der aktuellen Koordinate
+ if(eye_x >= 0)
+ {
+  signX = 1
+ }
+ if(eye_y >= 0)
+ {
+  signY = 1
+ }
+ if(eye_z >= 0)
+ {
+  signZ = 1
+ }
+
+ distX = eye_x - target_x
+ distY = eye_y - target_y
+ distZ = eye_z - target_z
+
+ cosa = Math.cos((distX^2 + distZ^2)^0.5 / (distX^2 + distZ^2 + distY^2)^0.5)
+ tanb = Math.tan(distZ/distY)
+ tanc = Math.tan(distX/distZ)
+
+ dy = cosa * moveSpeed
+ dx = tanb * dy
+ dz = tanc * dx
+
+ eye_x = eye_x - dx * signX
+ target_x = target_x - dx * signX
+ eye_y = eye_y - dy * signY
+ target_y = target_y - dy * signY
+ eye_z = eye_z - dz * signZ
+ target_z = target_z - dz * signZ
 }
 
 function moveBack()
 {
-	//alert(getEyeAngleYZ());
-	//r(-r)*r(-b)*r(-a)*t(-eye)*(strafe, up, -look, 1)
 	var signX = -1, signY=-1, signZ=-1
 	if(eye_x >= 0)
 	{
@@ -291,6 +343,7 @@ function moveBack()
 	eye_x = eye_x + Math.sin(getEyeAngleXZ(0)) * moveSpeed * signX
 	eye_y = eye_y + Math.sin(getEyeAngleYZ(0)) * moveSpeed * signY
 	eye_z = eye_z + Math.sin(getEyeAngleXY(0)) * moveSpeed * signZ
+
 	target_x = target_x + Math.sin(getEyeAngleXZ(0)) * moveSpeed * signX
 	target_y = target_y + Math.sin(getEyeAngleYZ(0)) * moveSpeed * signY
 	target_z = target_z + Math.sin(getEyeAngleXY(0)) * moveSpeed * signZ
@@ -298,7 +351,6 @@ function moveBack()
 
 function moveLeft()
 {
-  //rotate move rotate
 	var signX = -1, signY=-1, signZ=-1
 	if(eye_x >= 0)
 	{
@@ -315,6 +367,7 @@ function moveLeft()
 	eye_x = eye_x + Math.sin(getEyeAngleXZ(degreeToRadian(90))) * moveSpeed * signX
 	eye_y = eye_y + Math.sin(getEyeAngleYZ(degreeToRadian(90))) * moveSpeed * signY
 	eye_z = eye_z + Math.sin(getEyeAngleXY(degreeToRadian(90))) * moveSpeed * signZ
+
 	target_x = target_x + Math.sin(getEyeAngleXZ(degreeToRadian(90))) * moveSpeed * signX
 	target_y = target_y + Math.sin(getEyeAngleYZ(degreeToRadian(90))) * moveSpeed * signY
 	target_z = target_z + Math.sin(getEyeAngleXY(degreeToRadian(90))) * moveSpeed * signZ
@@ -322,39 +375,32 @@ function moveLeft()
 
 function moveRight()
 {
-	z = z-0.1*((1/Math.abs(z))*z)
-}
+	var signX = -1, signY=-1, signZ=-1
+	if(eye_x >= 0)
+	{
+		signX = 1
+	}
+	if(eye_y >= 0)
+	{
+		signY = 1
+	}
+	if(eye_z >= 0)
+	{
+		signZ = 1
+	}
+	eye_x = eye_x + Math.sin(getEyeAngleXZ(degreeToRadian(-90))) * moveSpeed * signX
+	eye_y = eye_y + Math.sin(getEyeAngleYZ(degreeToRadian(-90))) * moveSpeed * signY
+	eye_z = eye_z + Math.sin(getEyeAngleXY(degreeToRadian(-90))) * moveSpeed * signZ
 
-function getEyeAngles()
-{
-		//useless see glmatrix.net >_>
-		//korrekt impl siehe übung
-		var delta_x, delta_y, delta_z
-		var angXZ, angYZ, angXY
-
-		delta_x = eye_x - target_x;
-		delta_y = eye_y - target_y;
-		delta_z = eye_z - target_z;
-
-		angXZ = Math.atan(delta_x/delta_z)
-		angYZ = Math.atan(delta_y/delta_z)
-
-		if (delta_x != 0)
-		{
-			angXY = Math.atan(delta_y/delta_x)
-		}
-		else
-		{
-			angXY = Math.atan(0)
-		}
-		//TODO multiple return?
-		// r(-r)*r(-b)*r(-a)*t(-eye)*(strafe, up, -look, 1)
-
+	target_x = target_x + Math.sin(getEyeAngleXZ(degreeToRadian(-90))) * moveSpeed * signX
+	target_y = target_y + Math.sin(getEyeAngleYZ(degreeToRadian(-90))) * moveSpeed * signY
+	target_z = target_z + Math.sin(getEyeAngleXY(degreeToRadian(-90))) * moveSpeed * signZ
 }
 
 function getEyeAngleXZ(offset)
 {
-   //Y
+		//Hilfsfunktion zur Berechnung der Ausrichtung auf der XZ-Ebene.
+		//offset als Hilfe zur Manipulation der Ausrichtung.
 		var delta_x, delta_y, delta_z
 		var angXZ
 
@@ -368,7 +414,8 @@ function getEyeAngleXZ(offset)
 
 function getEyeAngleXY(offset)
 {
-  //Z
+		//Hilfsfunktion zur Berechnung der Ausrichtung auf der XY-Ebene.
+		//offset als Hilfe zur Manipulation der Ausrichtung.
 		var delta_x, delta_y
 		var angXY
 
@@ -389,7 +436,8 @@ function getEyeAngleXY(offset)
 
 function getEyeAngleYZ(offset)
 {
-  //X
+		//Hilfsfunktion zur Berechnung der Ausrichtung auf der YZ-Ebene.
+		//offset als Hilfe zur Manipulation der Ausrichtung.
 		var delta_y, delta_z
 		var angYZ
 
@@ -403,6 +451,7 @@ function getEyeAngleYZ(offset)
 
 function canvasCoords()
 {
+	//Debug-Funktion einer Canvas zum Anzeigen von Koordinaten.
 	canvasText = document.getElementById("text-canvas");
 	var ctx= canvasText.getContext("2d");
 	ctx.font="12px Georgia";
@@ -411,10 +460,17 @@ function canvasCoords()
 	ctx.fillText("x = " + eye_x ,0,20);
 	ctx.fillText("y = " + eye_y  + "",0,30);
 	ctx.fillText("z = " + eye_z + "",0,40);
+	ctx.fillText("Target: ",0,60);
+	ctx.fillText("x = " + target_x ,0,70);
+	ctx.fillText("y = " + target_y  + "",0,80);
+	ctx.fillText("z = " + target_z + "",0,90);
+
+
 }
 
 function coordsClear()
 {
+	//Löschen der Debug-Canvas.
 	canvasText = document.getElementById("text-canvas");
 	var ctx=canvasText.getContext("2d");
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -422,5 +478,6 @@ function coordsClear()
 
 function degreeToRadian(degrees)
 {
+	//Hilfsfunktion
 	return (degrees/180) * Math.PI()
 }
