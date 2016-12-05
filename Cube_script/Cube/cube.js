@@ -60,9 +60,9 @@ window.onload = function init()
 	canvas = document.getElementById("gl-canvas");
 	gl = WebGLUtils.setupWebGL(canvas);
 	
-	//window.addEventListener("keypress", eventHandling);	
-	window.addEventListener("keydown", keyDown);
-	window.addEventListener("keyup", keyUp);
+	window.addEventListener("keypress", eventHandling);	
+	//window.addEventListener("keydown", keyDown);
+	//window.addEventListener("keyup", keyUp);
 	
 	if (!gl) { alert("WebGL isn't available"); }
 
@@ -237,7 +237,7 @@ window.onload = function init()
 function render()
 {
 	movement()
-	//canvasCoords();
+	canvasCoords();
 	//eye = vec3.fromValues(eye_x, eye_y, eye_z);
 	//target = vec3.fromValues(target_x, target_y, target_z);
 	//up = vec3.fromValues(0.0, 1.0, 0.0);
@@ -261,18 +261,18 @@ function eventHandling(e)
 	switch(e.keyCode)
 	{
 		case 38:
-					mf2()
+					moveForward()
 					//moveFowardNew();
 					break;
-		case 37:
-					moveLeft();
+		case 65:
+					moveLeft()
 					break;
-		case 39:
-					moveRight();
+		case 68:
+					moveRight()
 					break;
 
-		case 40:
-					moveBack();
+		case 83:
+					moveBackward()
 					break;
 
 		default:
@@ -325,19 +325,52 @@ function movement()
 	}
 }
 
-function mf2()
+function moveForward()
 {
 	var distance = vec3.create();
-		var rotatedTarget = vec3.create();
-		vec3.rotateY(rotatedTarget, target, eye, Math.PI/2);
-		vec3.sub(distance, rotatedTarget, eye);
+		vec3.sub(distance, target, eye);
 		vec3.normalize(distance, distance);
 		vec3.scale(distance, distance, 0.1);
 		vec3.add(eye, eye, distance);
 		vec3.add(target, target, distance);
 		
 }
-function moveFoward()
+
+function moveBackward()
+{
+	var distance = vec3.create();
+		vec3.sub(distance, target, eye);
+		vec3.normalize(distance, distance);
+		vec3.scale(distance, distance, 0.1);
+		vec3.sub(eye, eye, distance);
+		vec3.sub(target, target, distance);
+}
+
+function moveLeft()
+{
+	var distance = vec3.create();
+	var rotatedTarget = vec3.create();
+	vec3.rotateY(rotatedTarget, target, eye, Math.PI/2);
+	vec3.sub(distance, rotatedTarget, eye);
+	vec3.normalize(distance, distance);
+	vec3.scale(distance, distance, 0.1);
+	vec3.add(eye, eye, distance);
+	vec3.add(target, target, distance);
+}
+
+function moveRight()
+{
+	var distance = vec3.create();
+	var rotatedTarget = vec3.create();
+	vec3.rotateY(rotatedTarget, target, eye, Math.PI*3/2);
+	vec3.sub(distance, rotatedTarget, eye);
+	vec3.normalize(distance, distance);
+	vec3.scale(distance, distance, 0.1);
+	vec3.add(eye, eye, distance);
+	vec3.add(target, target, distance);
+}
+
+function moveFowardOld()
 {
 	//Checken des Vorzeichens
 	var signX = -1, signY=-1, signZ=-1
@@ -403,7 +436,7 @@ function moveFowardNew()
  target_z = target_z - dz * signZ
 }
 
-function moveBack()
+function moveBackOld()
 {
 	var signX = -1, signY=-1, signZ=-1
 	if(eye_x >= 0)
@@ -427,7 +460,7 @@ function moveBack()
 	target_z = target_z + Math.sin(getEyeAngleXY(0)) * moveSpeed * signZ
 }
 
-function moveLeft()
+function moveLeftOld()
 {
 	var signX = -1, signY=-1, signZ=-1
 	if(eye_x >= 0)
@@ -451,7 +484,7 @@ function moveLeft()
 	target_z = target_z + Math.sin(getEyeAngleXY(degreeToRadian(90))) * moveSpeed * signZ
 }
 
-function moveRight()
+function moveRightOld()
 {
 	var signX = -1, signY=-1, signZ=-1
 	if(eye_x >= 0)
