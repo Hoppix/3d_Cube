@@ -60,6 +60,12 @@ window.onload = function init()
 	canvas.onclick = function() {
 		canvas.requestPointerLock();
 	}
+
+	// Hook pointer lock state change events for different browsers
+	document.addEventListener('pointerlockchange', lockChangeAlert, false);
+	document.addEventListener('mozpointerlockchange', lockChangeAlert, false);
+
+
 	if (!gl) { alert("WebGL isn't available"); }
 
 	// Specify position and color of the vertices
@@ -320,6 +326,24 @@ function moveRight()
 	vec3.scale(distance, distance, 0.1);
 	vec3.add(eye, eye, distance);
 	vec3.add(target, target, distance);
+}
+
+
+function lockChangeAlert() {
+	if (document.pointerLockElement === canvas ||
+		document.mozPointerLockElement === canvas) {
+		console.log('The pointer lock status is now locked');
+		document.addEventListener("mousemove", updatePosition, false);
+	} else {
+		console.log('The pointer lock status is now unlocked');
+		document.removeEventListener("mousemove", updatePosition, false);
+	}
+}
+
+function updatePosition(e)
+{
+	var korrektur = -0.005;
+	vec3.rotateY(target, target, eye, e.movementX*korrektur);
 }
 
 
