@@ -191,8 +191,7 @@ window.onload = function init()
 	modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
 	gl.uniformMatrix4fv(modelMatrixLoc, false, modelMatrix);
 
-    // Set view matrix
-	//
+  // Set view matrix
 	eye = vec3.fromValues(eye_x, eye_y, eye_z);
 	target = vec3.fromValues(eye_x, eye_y, eye_z);
 	up = vec3.fromValues(0.0, 1.0, 0.0);
@@ -261,27 +260,15 @@ function eventHandling(e)
 
 function moveFoward()
 {
-	//alert(getEyeAngleYZ());
-	//r(-r)*r(-b)*r(-a)*t(-eye)*(strafe, up, -look, 1)
-	var signX = -1, signY=-1, signZ=-1
-	if(eye_x >= 0)
-	{
-		signX = 1
-	}
-	if(eye_y >= 0)
-	{
-		signY = 1
-	}
-	if(eye_z >= 0)
-	{
-		signZ = 1
-	}
-	eye_x = eye_x - Math.sin(getEyeAngleXZ(0)) * moveSpeed * signX
-	eye_y = eye_y - Math.sin(getEyeAngleYZ(0)) * moveSpeed * signY
-	eye_z = eye_z - Math.sin(getEyeAngleXY(0)) * moveSpeed * signZ
-	target_x = target_x - Math.sin(getEyeAngleXZ(0)) * moveSpeed * signX
-	target_y = target_y - Math.sin(getEyeAngleYZ(0)) * moveSpeed * signY
-	target_z = target_z - Math.sin(getEyeAngleXY(0)) * moveSpeed * signZ
+  //ang = Y
+  // roll = z
+  // elev X
+    eye_x += moveSpeed * Math.sin(getEyeAngleXZ(0) * Math.PI / 180.0);
+    eye_x += moveSpeed * Math.sin(getEyeAngleXY(0) * Math.PI / 180.0);
+    eye_y -= moveSpeed * Math.sin(getEyeAngleYZ(0) * Math.PI / 180.0);
+    eye_y += moveSpeed * Math.sin(getEyeAngleXY(0) * Math.PI / 180.0);
+    eye_z -= moveSpeed * Math.cos(getEyeAngleXZ(0) * Math.PI / 180.0);
+    eye_z -= moveSpeed * Math.cos(getEyeAngleYZ(0) * Math.PI / 180.0);
 }
 
 function moveBack()
@@ -311,6 +298,7 @@ function moveBack()
 
 function moveLeft()
 {
+  //rotate move rotate
 	var signX = -1, signY=-1, signZ=-1
 	if(eye_x >= 0)
 	{
@@ -340,17 +328,17 @@ function moveRight()
 function getEyeAngles()
 {
 		//useless see glmatrix.net >_>
-		//korrekt impl siehe übung 		
+		//korrekt impl siehe übung
 		var delta_x, delta_y, delta_z
 		var angXZ, angYZ, angXY
 
 		delta_x = eye_x - target_x;
 		delta_y = eye_y - target_y;
 		delta_z = eye_z - target_z;
-		
+
 		angXZ = Math.atan(delta_x/delta_z)
 		angYZ = Math.atan(delta_y/delta_z)
-		
+
 		if (delta_x != 0)
 		{
 			angXY = Math.atan(delta_y/delta_x)
@@ -366,25 +354,27 @@ function getEyeAngles()
 
 function getEyeAngleXZ(offset)
 {
+   //Y
 		var delta_x, delta_y, delta_z
 		var angXZ
 
 		delta_x = eye_x - target_x;
 		delta_z = eye_z - target_z;
-		
+
 		angXZ = Math.atan(delta_x/delta_z + offset)
-		
+
 		return angXZ;
 }
 
 function getEyeAngleXY(offset)
 {
+  //Z
 		var delta_x, delta_y
 		var angXY
 
 		delta_x = eye_x - target_x;
 		delta_y = eye_y - target_y;
-		
+
 		if (delta_x != 0)
 		{
 			angXY = Math.atan(delta_y/delta_x + offset)
@@ -393,20 +383,21 @@ function getEyeAngleXY(offset)
 		{
 			angXY = Math.atan(0)
 		}
-		
+
 		return angXY;
 }
 
 function getEyeAngleYZ(offset)
 {
+  //X
 		var delta_y, delta_z
 		var angYZ
 
 		delta_y = eye_y - target_y;
 		delta_z = eye_z - target_z;
-		
+
 		angYZ = Math.atan(delta_y/delta_z + offset)
-		
+
 		return angYZ;
 }
 
@@ -420,8 +411,6 @@ function canvasCoords()
 	ctx.fillText("x = " + eye_x ,0,20);
 	ctx.fillText("y = " + eye_y  + "",0,30);
 	ctx.fillText("z = " + eye_z + "",0,40);
-
-
 }
 
 function coordsClear()
