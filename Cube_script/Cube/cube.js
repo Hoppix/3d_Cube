@@ -1,12 +1,12 @@
 var gl;
 var canvas;
 var canvasText;
-
-var positions;
-var colors;
-
-var positionBuffer;
-var colorBuffer;
+//Objektdaten
+var cubePositions;
+var cubeColors;
+//ObjektBuffer
+var cubePositionBuffer;
+var cubeColorBuffer;
 
 var modelMatrixLoc;
 var modelMatrix;
@@ -19,23 +19,23 @@ var projectionMatrix;
 
 var program;
 
-var moveSpeed = 0.25;
+var moveSpeed = 0.2;
 
-//KamaraPosition
+//Kamaraverktoren
 var eye;
 var target;
 var up;
-
+//Kameraposition
 var eye_x,eye_y,eye_z
-eye_x = 0.0;
+eye_x = 4.0;
 eye_y = 0.0;
-eye_z = 2.0;
-
+eye_z = 4.0;
+//Kameraziel
 var target_x, target_y,target_z
 target_x = 0.0;
 target_y = 0.0;
 target_z = 0.0;
-
+//Setzen der Werte
 eye = vec3.fromValues(eye_x, eye_y, eye_z);
 target = vec3.fromValues(target_x, target_y, target_z);
 up = vec3.fromValues(0.0, 1.0, 0.0);
@@ -47,31 +47,21 @@ window.onload = function init()
 	canvas = document.getElementById("gl-canvas");
 	gl = WebGLUtils.setupWebGL(canvas);
 
-	window.addEventListener("keypress", eventHandling);
-	//window.addEventListener("keydown", keyDown);
-	//window.addEventListener("keyup", keyUp);
+	//Listener für Bewegung
+	window.addEventListener("keypress", moveEventHandling);
 
-	canvas.requestPointerLock = canvas.requestPointerLock ||
-		canvas.mozRequestPointerLock;
-
-	document.exitPointerLock = document.exitPointerLock ||
-		document.mozExitPointerLock;
-
-	canvas.onclick = function() {
-		canvas.requestPointerLock();
-	}
-
-	// Hook pointer lock state change events for different browsers
-	document.addEventListener('pointerlockchange', lockChangeAlert, false);
-	document.addEventListener('mozpointerlockchange', lockChangeAlert, false);
+	//Listener für Maus-Sperre
+	pointerLockHandling();
+	document.addEventListener('pointerlockchange', setupMouseLock, false);
+	document.addEventListener('mozpointerlockchange', setupMouseLock, false);
 
 
 	if (!gl) { alert("WebGL isn't available"); }
 
 	// Specify position and color of the vertices
 
-									 // Front
-	positions = new Float32Array([  -0.5, -0.5,  0.5,
+									 									// Front
+	cubePositions = new Float32Array([  -0.5, -0.5,  0.5,
 								     0.5, -0.5,  0.5,
 								     0.5,  0.5,  0.5,
 
@@ -126,7 +116,7 @@ window.onload = function init()
 								]);
 
 									// Front
-	colors = new Float32Array([     0, 0, 1, 1,
+	cubeColors = new Float32Array([     0, 0, 1, 1,
 									0, 0, 1, 1,
 									0, 0, 1, 1,
 									0, 0, 1, 1,
@@ -187,9 +177,10 @@ window.onload = function init()
 
     // Load positions into the GPU and associate shader variables
 
-	positionBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+	cubePositionBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, cubePositionBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, cubePositions, gl.STATIC_DRAW);
+
 
 	var vPosition = gl.getAttribLocation(program, "vPosition");
 	gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
@@ -197,9 +188,9 @@ window.onload = function init()
 
 	// Load colors into the GPU and associate shader variables
 
-	colorBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+	cubeColorBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, cubeColorBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, cubeColors, gl.STATIC_DRAW);
 
 	var vColor = gl.getAttribLocation(program, "vColor");
 	gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
@@ -215,17 +206,7 @@ window.onload = function init()
 	modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
 	gl.uniformMatrix4fv(modelMatrixLoc, false, modelMatrix);
 
-    // Set view matrix
-	//
-
-	//viewMatrix = mat4.create();
-	//mat4.lookAt(viewMatrix, eye, target, up);
-
-	//viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
-	//gl.uniformMatrix4fv(viewMatrixLoc, false, viewMatrix);
-
-    // Set projection matrix
-	// Kamera
+  // Set projection matrix
 	projectionMatrix = mat4.create();
 	mat4.perspective(projectionMatrix, Math.PI * 0.25, canvas.width / canvas.height, 0.5, 100);
 
@@ -233,15 +214,13 @@ window.onload = function init()
 	gl.uniformMatrix4fv(projectionMatrixLoc, false, projectionMatrix);
 
 	canvasCoords();
+	canvasGuide();
 	render();
 };
 
 function render()
 {
 	canvasCoords();
-	//eye = vec3.fromValues(eye_x, eye_y, eye_z);
-	//target = vec3.fromValues(target_x, target_y, target_z);
-	//up = vec3.fromValues(0.0, 1.0, 0.0);
 
 	viewMatrix = mat4.create();
 	mat4.lookAt(viewMatrix, eye, target, up);
@@ -250,15 +229,15 @@ function render()
 	gl.uniformMatrix4fv(viewMatrixLoc, false, viewMatrix);
 
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.drawArrays(gl.TRIANGLES, 0, positions.length/3);
+	gl.drawArrays(gl.TRIANGLES, 0, cubePositions.length/3);
 	requestAnimFrame(render);
 }
 
-function eventHandling(e)
+function moveEventHandling(e)
 {
-
 	//Auslesen des keycodes zum spezifizieren welche Taste gedrückt wurde.
 	//38: ArrowUp, 37: ArrowLeft, 39: ArrowRight
+	//WASD Keycodes funktionieren nicht.
 	switch(e.keyCode)
 	{
 		case 38:
@@ -288,7 +267,7 @@ function moveForward()
 	var distance = vec3.create();
 		vec3.sub(distance, target, eye);
 		vec3.normalize(distance, distance);
-		vec3.scale(distance, distance, 0.1);
+		vec3.scale(distance, distance, moveSpeed);
 		vec3.add(eye, eye, distance);
 		vec3.add(target, target, distance);
 
@@ -299,7 +278,7 @@ function moveBackward()
 	var distance = vec3.create();
 		vec3.sub(distance, target, eye);
 		vec3.normalize(distance, distance);
-		vec3.scale(distance, distance, 0.1);
+		vec3.scale(distance, distance, moveSpeed);
 		vec3.sub(eye, eye, distance);
 		vec3.sub(target, target, distance);
 }
@@ -311,7 +290,7 @@ function moveLeft()
 	vec3.rotateY(rotatedTarget, target, eye, Math.PI/2);
 	vec3.sub(distance, rotatedTarget, eye);
 	vec3.normalize(distance, distance);
-	vec3.scale(distance, distance, 0.1);
+	vec3.scale(distance, distance, moveSpeed);
 	vec3.add(eye, eye, distance);
 	vec3.add(target, target, distance);
 }
@@ -323,27 +302,46 @@ function moveRight()
 	vec3.rotateY(rotatedTarget, target, eye, Math.PI*3/2);
 	vec3.sub(distance, rotatedTarget, eye);
 	vec3.normalize(distance, distance);
-	vec3.scale(distance, distance, 0.1);
+	vec3.scale(distance, distance, moveSpeed);
 	vec3.add(eye, eye, distance);
 	vec3.add(target, target, distance);
 }
 
 
-function lockChangeAlert() {
-	if (document.pointerLockElement === canvas ||
-		document.mozPointerLockElement === canvas) {
-		console.log('The pointer lock status is now locked');
-		document.addEventListener("mousemove", updatePosition, false);
-	} else {
-		console.log('The pointer lock status is now unlocked');
-		document.removeEventListener("mousemove", updatePosition, false);
+function pointerLockHandling()
+{
+	//Fragt beim Brower den Mouselock an.
+	canvas.requestPointerLock = canvas.requestPointerLock ||
+		canvas.mozRequestPointerLock;
+
+	document.exitPointerLock = document.exitPointerLock ||
+		document.mozExitPointerLock;
+
+	canvas.onclick = function()
+	{
+		canvas.requestPointerLock();
 	}
 }
 
-function updatePosition(e)
+function setupMouseLock()
 {
-	var korrektur = -0.005;
+	//Wenn die canvas geklickt wird dann wird die Mausbewegung aktiviert.
+	if (document.pointerLockElement === canvas ||
+		document.mozPointerLockElement === canvas)
+	{
+		document.addEventListener("mousemove", setLook, false);
+	}
+	else
+	{
+		document.removeEventListener("mousemove", setLook, false);
+	}
+}
+
+function setLook(e)
+{
+	var korrektur = -0.001;
 	vec3.rotateY(target, target, eye, e.movementX*korrektur);
+	//vec3.rotateX(target, target, eye, e.movementY*korrektur);
 }
 
 
@@ -351,19 +349,30 @@ function updatePosition(e)
 function canvasCoords()
 {
 	//Debug-Funktion einer Canvas zum Anzeigen von Koordinaten.
+	canvasText = document.getElementById("debug-canvas");
+	var ctx= canvasText.getContext("2d");
+	ctx.font="12px Georgia";
+	ctx.fillStyle = 'white';
+	ctx.fillText("Debug Kamera: ",0,10);
+	ctx.fillText("x = " + eye[0] ,0,20);
+	ctx.fillText("y = " + eye[1]  + "",0,30);
+	ctx.fillText("z = " + eye[2] + "",0,40);
+	ctx.fillText("Debug Target: ",0,60);
+	ctx.fillText("x = " + target[0] ,0,70);
+	ctx.fillText("y = " + target[1]  + "",0,80);
+	ctx.fillText("z = " + target[2] + "",0,90);
+}
+
+function canvasGuide()
+{
 	canvasText = document.getElementById("text-canvas");
 	var ctx= canvasText.getContext("2d");
 	ctx.font="12px Georgia";
 	ctx.fillStyle = 'white';
-	ctx.fillText("Kamera: ",0,10);
-	ctx.fillText("x = " + eye_x ,0,20);
-	ctx.fillText("y = " + eye_y  + "",0,30);
-	ctx.fillText("z = " + eye_z + "",0,40);
-	ctx.fillText("Target: ",0,60);
-	ctx.fillText("x = " + target_x ,0,70);
-	ctx.fillText("y = " + target_y  + "",0,80);
-	ctx.fillText("z = " + target_z + "",0,90);
-
+	ctx.fillText("Bewegung: ",0,10);
+	ctx.fillText("Pfeiltasten" ,0,20);
+	ctx.fillText("Umsehen:" ,0,50);
+	ctx.fillText("Canvas-Click",0,60);
 
 }
 
