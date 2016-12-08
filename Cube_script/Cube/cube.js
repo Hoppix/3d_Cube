@@ -1,9 +1,11 @@
 var gl;
 var canvas;
 var canvasText;
+
 //Objektdaten
 var cubePositions;
 var cubeColors;
+
 //ObjektBuffer
 var cubePositionBuffer;
 var cubeColorBuffer;
@@ -18,23 +20,26 @@ var projectionMatrixLoc;
 var projectionMatrix;
 
 var program;
-
+var keys = [];
 var moveSpeed = 0.2;
 
 //Kamaraverktoren
 var eye;
 var target;
 var up;
+
 //Kameraposition
 var eye_x,eye_y,eye_z
 eye_x = 4.0;
 eye_y = 0.0;
 eye_z = 4.0;
+
 //Kameraziel
 var target_x, target_y,target_z
 target_x = 0.0;
 target_y = 0.0;
 target_z = 0.0;
+
 //Setzen der Werte
 eye = vec3.fromValues(eye_x, eye_y, eye_z);
 target = vec3.fromValues(target_x, target_y, target_z);
@@ -48,7 +53,8 @@ window.onload = function init()
 	gl = WebGLUtils.setupWebGL(canvas);
 
 	//Listener für Bewegung
-	window.addEventListener("keypress", moveEventHandling);
+	window.addEventListener("keydown", keyDown);
+	window.addEventListener("keyup", keyUp);
 
 	//Listener für Maus-Sperre
 	pointerLockHandling();
@@ -112,7 +118,7 @@ window.onload = function init()
 
 									 0.5,  0.5, -0.5,
 									-0.5,  0.5, -0.5,
-									-0.5,  0.5,  0.5
+									-0.5,  0.5,  0.5,
 								]);
 
 									// Front
@@ -161,7 +167,7 @@ window.onload = function init()
 									0, 1, 1, 1,
 									0, 1, 1, 1,
 									0, 1, 1, 1,
-									0, 1, 1, 1
+									0, 1, 1, 1,
 								]);
 
 	// Configure viewport
@@ -213,15 +219,12 @@ window.onload = function init()
 	projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 	gl.uniformMatrix4fv(projectionMatrixLoc, false, projectionMatrix);
 
-	canvasCoords();
-	canvasGuide();
 	render();
 };
 
 function render()
 {
-	canvasCoords();
-
+	moveEventHandling();
 	viewMatrix = mat4.create();
 	mat4.lookAt(viewMatrix, eye, target, up);
 
@@ -229,82 +232,91 @@ function render()
 	gl.uniformMatrix4fv(viewMatrixLoc, false, viewMatrix);
 
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.drawArrays(gl.TRIANGLES, 0, cubePositions.length/3);
+	gl.drawArrays(gl.TRIANGLES, 0, 24+12);
 	requestAnimFrame(render);
 }
 
-function moveEventHandling(e)
+function moveEventHandling()
 {
 	//Auslesen des keycodes zum spezifizieren welche Taste gedrückt wurde.
 	//38: ArrowUp, 37: ArrowLeft, 39: ArrowRight
 	//WASD Keycodes funktionieren nicht.
-	switch(e.keyCode)
-	{
-		case 38:
-					moveForward()
-					//moveFowardNew();
-					break;
-		case 37:
-					moveLeft()
-					break;
-		case 39:
-					moveRight()
-					break;
-
-		case 40:
-					moveBackward()
-					break;
-
-		default:
-					break;
-	}
+	moveForward();
+	moveBackward();
+	moveLeft();
+	moveRight();
 }
 
+function keyDown(e)
+{
+	keys[e.keyCode] = true;
+}
+
+function keyUp(e)
+{
+	keys[e.keyCode] = false;
+}
 
 
 function moveForward()
 {
-	var distance = vec3.create();
+	if (keys[38]) // w
+	{
+		console.log("s key")
+		var distance = vec3.create();
 		vec3.sub(distance, target, eye);
 		vec3.normalize(distance, distance);
-		vec3.scale(distance, distance, moveSpeed);
+		vec3.scale(distance, distance, 0.1);
 		vec3.add(eye, eye, distance);
 		vec3.add(target, target, distance);
-
+	}
 }
 
 function moveBackward()
 {
-	var distance = vec3.create();
+	if (keys[40]) // s
+	{
+		console.log("s key")
+		var distance = vec3.create();
 		vec3.sub(distance, target, eye);
 		vec3.normalize(distance, distance);
-		vec3.scale(distance, distance, moveSpeed);
+		vec3.scale(distance, distance, 0.1);
 		vec3.sub(eye, eye, distance);
 		vec3.sub(target, target, distance);
+	}
 }
 
 function moveLeft()
 {
-	var distance = vec3.create();
-	var rotatedTarget = vec3.create();
-	vec3.rotateY(rotatedTarget, target, eye, Math.PI/2);
-	vec3.sub(distance, rotatedTarget, eye);
-	vec3.normalize(distance, distance);
-	vec3.scale(distance, distance, moveSpeed);
-	vec3.add(eye, eye, distance);
-	vec3.add(target, target, distance);
+	if (keys[37]) // a
+	{
+		console.log("s key")
+		var distance = vec3.create();
+		var rotatedTarget = vec3.create();
+		vec3.rotateY(rotatedTarget, target, eye, Math.PI/2);
+		vec3.sub(distance, rotatedTarget, eye);
+		vec3.normalize(distance, distance);
+		vec3.scale(distance, distance, 0.1);
+		vec3.add(eye, eye, distance);
+		vec3.add(target, target, distance);
+
+	}
 }
 
 function moveRight()
 {
-	var distance = vec3.create();
-	var rotatedTarget = vec3.create();
-	vec3.rotateY(rotatedTarget, target, eye, Math.PI*3/2);
-	vec3.sub(distance, rotatedTarget, eye);
-	vec3.normalize(distance, distance);
-	vec3.scale(distance, distance, moveSpeed);
-	vec3.add(eye, eye, distance);
-	vec3.add(target, target, distance);
+	if (keys[39]) // d
+	{
+		console.log("s key")
+		var distance = vec3.create();
+		var rotatedTarget = vec3.create();
+		vec3.rotateY(rotatedTarget, target, eye, Math.PI*3/2);
+		vec3.sub(distance, rotatedTarget, eye);
+		vec3.normalize(distance, distance);
+		vec3.scale(distance, distance, 0.1);
+		vec3.add(eye, eye, distance);
+		vec3.add(target, target, distance);
+	}
 }
 
 
@@ -339,50 +351,11 @@ function setupMouseLock()
 
 function setLook(e)
 {
-	var korrektur = -0.001;
+	var korrektur = -0.0033;
 	vec3.rotateY(target, target, eye, e.movementX*korrektur);
 	//vec3.rotateX(target, target, eye, e.movementY*korrektur);
 }
 
-
-
-function canvasCoords()
-{
-	//Debug-Funktion einer Canvas zum Anzeigen von Koordinaten.
-	canvasText = document.getElementById("debug-canvas");
-	var ctx= canvasText.getContext("2d");
-	ctx.font="12px Georgia";
-	ctx.fillStyle = 'white';
-	ctx.fillText("Debug Kamera: ",0,10);
-	ctx.fillText("x = " + eye[0] ,0,20);
-	ctx.fillText("y = " + eye[1]  + "",0,30);
-	ctx.fillText("z = " + eye[2] + "",0,40);
-	ctx.fillText("Debug Target: ",0,60);
-	ctx.fillText("x = " + target[0] ,0,70);
-	ctx.fillText("y = " + target[1]  + "",0,80);
-	ctx.fillText("z = " + target[2] + "",0,90);
-}
-
-function canvasGuide()
-{
-	canvasText = document.getElementById("text-canvas");
-	var ctx= canvasText.getContext("2d");
-	ctx.font="12px Georgia";
-	ctx.fillStyle = 'white';
-	ctx.fillText("Bewegung: ",0,10);
-	ctx.fillText("Pfeiltasten" ,0,20);
-	ctx.fillText("Umsehen:" ,0,50);
-	ctx.fillText("Canvas-Click",0,60);
-
-}
-
-function coordsClear()
-{
-	//Löschen der Debug-Canvas.
-	canvasText = document.getElementById("text-canvas");
-	var ctx=canvasText.getContext("2d");
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
 
 function degreeToRadian(degrees)
 {
