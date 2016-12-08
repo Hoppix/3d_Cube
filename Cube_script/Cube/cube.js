@@ -238,9 +238,6 @@ function render()
 
 function moveEventHandling()
 {
-	//Auslesen des keycodes zum spezifizieren welche Taste gedrückt wurde.
-	//38: ArrowUp, 37: ArrowLeft, 39: ArrowRight
-	//WASD Keycodes funktionieren nicht.
 	moveForward();
 	moveBackward();
 	moveLeft();
@@ -260,13 +257,12 @@ function keyUp(e)
 
 function moveForward()
 {
-	if (keys[38]) // w
+	if (keys[38])
 	{
-		console.log("s key")
 		var distance = vec3.create();
 		vec3.sub(distance, target, eye);
 		vec3.normalize(distance, distance);
-		vec3.scale(distance, distance, 0.1);
+		vec3.scale(distance, distance, moveSpeed);
 		vec3.add(eye, eye, distance);
 		vec3.add(target, target, distance);
 	}
@@ -274,13 +270,12 @@ function moveForward()
 
 function moveBackward()
 {
-	if (keys[40]) // s
+	if (keys[40])
 	{
-		console.log("s key")
 		var distance = vec3.create();
 		vec3.sub(distance, target, eye);
 		vec3.normalize(distance, distance);
-		vec3.scale(distance, distance, 0.1);
+		vec3.scale(distance, distance, moveSpeed);
 		vec3.sub(eye, eye, distance);
 		vec3.sub(target, target, distance);
 	}
@@ -290,13 +285,12 @@ function moveLeft()
 {
 	if (keys[37]) // a
 	{
-		console.log("s key")
 		var distance = vec3.create();
 		var rotatedTarget = vec3.create();
 		vec3.rotateY(rotatedTarget, target, eye, Math.PI/2);
 		vec3.sub(distance, rotatedTarget, eye);
 		vec3.normalize(distance, distance);
-		vec3.scale(distance, distance, 0.1);
+		vec3.scale(distance, distance, moveSpeed);
 		vec3.add(eye, eye, distance);
 		vec3.add(target, target, distance);
 
@@ -307,13 +301,12 @@ function moveRight()
 {
 	if (keys[39]) // d
 	{
-		console.log("s key")
 		var distance = vec3.create();
 		var rotatedTarget = vec3.create();
 		vec3.rotateY(rotatedTarget, target, eye, Math.PI*3/2);
 		vec3.sub(distance, rotatedTarget, eye);
 		vec3.normalize(distance, distance);
-		vec3.scale(distance, distance, 0.1);
+		vec3.scale(distance, distance, moveSpeed);
 		vec3.add(eye, eye, distance);
 		vec3.add(target, target, distance);
 	}
