@@ -119,6 +119,13 @@ window.onload = function init()
 									 0.5,  0.5, -0.5,
 									-0.5,  0.5, -0.5,
 									-0.5,  0.5,  0.5,
+
+									-30, -0.5, -30,
+									-30, -0.5, 30,
+									30, -0.5, -30,
+									-30, -0.5, 30,
+									30, -0.5, 30,
+									30, -0.5, -30,
 								]);
 
 									// Front
@@ -168,6 +175,13 @@ window.onload = function init()
 									0, 1, 1, 1,
 									0, 1, 1, 1,
 									0, 1, 1, 1,
+
+									0, 0, 0, 1,
+										0, 0, 0, 1,
+											0, 0, 0, 1,
+												0, 0, 0, 1,
+												0, 0, 0, 1,
+												0, 0, 0, 1,
 								]);
 
 	// Configure viewport
@@ -204,7 +218,8 @@ window.onload = function init()
 
 	// Set model matrix
 
-	modelMatrix = new Float32Array([1, 0, 0, 0,
+	modelMatrix = new Float32Array([
+									1, 0, 0, 0,
 									0, 1, 0, 0,
 									0, 0, 1, 0,
 									0, 0, 0, 1]);
@@ -232,7 +247,7 @@ function render()
 	gl.uniformMatrix4fv(viewMatrixLoc, false, viewMatrix);
 
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.drawArrays(gl.TRIANGLES, 0, 24+12);
+	gl.drawArrays(gl.TRIANGLES, 0, 108/3+6);
 	requestAnimFrame(render);
 }
 
@@ -259,12 +274,16 @@ function moveForward()
 {
 	if (keys[87])
 	{
+		const backupEye = eye[1];
+		const backupTarget = target[1];
 		var distance = vec3.create();
 		vec3.sub(distance, target, eye);
 		vec3.normalize(distance, distance);
 		vec3.scale(distance, distance, moveSpeed);
 		vec3.add(eye, eye, distance);
 		vec3.add(target, target, distance);
+		eye[1] = backupEye;
+		target[1] = backupTarget;
 	}
 }
 
@@ -272,12 +291,16 @@ function moveBackward()
 {
 	if (keys[83])
 	{
+		const backupEye = eye[1];
+		const backupTarget = target[1];
 		var distance = vec3.create();
 		vec3.sub(distance, target, eye);
 		vec3.normalize(distance, distance);
 		vec3.scale(distance, distance, moveSpeed);
 		vec3.sub(eye, eye, distance);
 		vec3.sub(target, target, distance);
+		eye[1] = backupEye;
+		target[1] = backupTarget;
 	}
 }
 
@@ -285,6 +308,8 @@ function moveLeft()
 {
 	if (keys[65])
 	{
+		const backupEye = eye[1];
+		const backupTarget = target[1];
 		var distance = vec3.create();
 		var rotatedTarget = vec3.create();
 		vec3.rotateY(rotatedTarget, target, eye, Math.PI/2);
@@ -293,6 +318,8 @@ function moveLeft()
 		vec3.scale(distance, distance, moveSpeed);
 		vec3.add(eye, eye, distance);
 		vec3.add(target, target, distance);
+		eye[1] = backupEye;
+		target[1] = backupTarget;
 
 	}
 }
@@ -301,6 +328,8 @@ function moveRight()
 {
 	if (keys[68]) // d
 	{
+		const backupEye = eye[1];
+		const backupTarget = target[1];
 		var distance = vec3.create();
 		var rotatedTarget = vec3.create();
 		vec3.rotateY(rotatedTarget, target, eye, Math.PI*3/2);
@@ -309,6 +338,8 @@ function moveRight()
 		vec3.scale(distance, distance, moveSpeed);
 		vec3.add(eye, eye, distance);
 		vec3.add(target, target, distance);
+		eye[1] = backupEye;
+		target[1] = backupTarget;
 	}
 }
 
@@ -346,7 +377,7 @@ function setLook(e)
 {
 	var korrektur = -0.0033;
 	vec3.rotateY(target, target, eye, e.movementX*korrektur);
-	//vec3.rotateX(target, target, eye, e.movementY*korrektur);
+	vec3.rotateX(target, target, eye, e.movementY*korrektur);
 }
 
 
