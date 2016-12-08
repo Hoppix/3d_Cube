@@ -257,7 +257,7 @@ function keyUp(e)
 
 function moveForward()
 {
-	if (keys[38])
+	if (keys[87])
 	{
 		var distance = vec3.create();
 		vec3.sub(distance, target, eye);
@@ -270,7 +270,7 @@ function moveForward()
 
 function moveBackward()
 {
-	if (keys[40])
+	if (keys[83])
 	{
 		var distance = vec3.create();
 		vec3.sub(distance, target, eye);
@@ -283,7 +283,7 @@ function moveBackward()
 
 function moveLeft()
 {
-	if (keys[37]) // a
+	if (keys[65])
 	{
 		var distance = vec3.create();
 		var rotatedTarget = vec3.create();
@@ -299,7 +299,7 @@ function moveLeft()
 
 function moveRight()
 {
-	if (keys[39]) // d
+	if (keys[68]) // d
 	{
 		var distance = vec3.create();
 		var rotatedTarget = vec3.create();
