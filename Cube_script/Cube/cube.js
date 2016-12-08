@@ -386,3 +386,13 @@ function degreeToRadian(degrees)
 	//Hilfsfunktion
 	return (degrees/180) * Math.PI()
 }
+
+function goFullScreen(){
+    var canvasFull = document.getElementById("gl-canvas");
+    if(canvasFull.requestFullScreen)
+        canvasFull.requestFullScreen();
+    else if(canvasFull.webkitRequestFullScreen)
+        canvas.webkitRequestFullScreen();
+    else if(canvasFull.mozRequestFullScreen)
+        canvasFull.mozRequestFullScreen();
+}
