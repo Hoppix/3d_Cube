@@ -5,6 +5,7 @@ var canvasText;
 //Objektdaten
 var cubePositions;
 var cubeColors;
+var cubeNormals;
 
 //ObjektBuffer
 var cubePositionBuffer;
@@ -67,11 +68,11 @@ window.onload = function init()
 	// Specify position and color of the vertices
 
 									 									// Front
-	cubePositions = new Float32Array([  -0.5, -0.5,  0.5,
-								     0.5, -0.5,  0.5,
-								     0.5,  0.5,  0.5,
+	cubePositions = new Float32Array([  -0.5, -0.5,  0.5, //001
+								     0.5, -0.5,  0.5,     //001
+								     0.5,  0.5,  0.5,     //001
 
-									 0.5,  0.5,  0.5,
+									 0.5,  0.5,  0.5,     
 									-0.5,  0.5,  0.5,
 									-0.5, -0.5,  0.5,
 
@@ -120,6 +121,7 @@ window.onload = function init()
 									-0.5,  0.5, -0.5,
 									-0.5,  0.5,  0.5,
 
+									//Plane
 									-30, -0.5, -30,
 									-30, -0.5, 30,
 									30, -0.5, -30,
@@ -127,6 +129,45 @@ window.onload = function init()
 									30, -0.5, 30,
 									30, -0.5, -30,
 								]);
+								
+	cubeNormals = new Float32Array([
+									//Front
+									0.0,  0.0,  1.0,
+									0.0,  0.0,  1.0,
+								    0.0,  0.0,  1.0,
+									0.0,  0.0,  1.0,
+									
+									//Right
+									1.0,  0.0,  0.0,
+									1.0,  0.0,  0.0,
+									1.0,  0.0,  0.0,
+									1.0,  0.0,  0.0,
+									//Back
+									0.0,  0.0, -1.0,
+									0.0,  0.0, -1.0,
+									0.0,  0.0, -1.0,
+									0.0,  0.0, -1.0,
+									//Left
+									-1.0,  0.0,  0.0,
+									-1.0,  0.0,  0.0,
+									-1.0,  0.0,  0.0,
+									-1.0,  0.0,  0.0,
+									//Bottom
+									0.0,  -1.0,  0.0,
+									0.0,  -1.0,  0.0,
+									0.0,  -1.0,  0.0,
+									0.0,  -1.0,  0.0,
+									//Top
+									0.0,  1.0,  0.0,
+									0.0,  1.0,  0.0,
+									0.0,  1.0,  0.0,
+									0.0,  1.0,  0.0,
+									//Plane
+									0.0,  1.0,  0.0,
+									0.0,  1.0,  0.0,
+									0.0,  1.0,  0.0,
+									0.0,  1.0,  0.0
+												]);
 
 									// Front
 	cubeColors = new Float32Array([     0, 0, 1, 1,
@@ -177,11 +218,11 @@ window.onload = function init()
 									0, 1, 1, 1,
 
 									0, 0, 0, 1,
-										0, 0, 0, 1,
-											0, 0, 0, 1,
-												0, 0, 0, 1,
-												0, 0, 0, 1,
-												0, 0, 0, 1,
+									0, 0, 0, 1,
+								    0, 0, 0, 1,
+									0, 0, 0, 1,
+									0, 0, 0, 1,
+									0, 0, 0, 1,
 								]);
 
 	// Configure viewport
@@ -215,6 +256,16 @@ window.onload = function init()
 	var vColor = gl.getAttribLocation(program, "vColor");
 	gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
 	gl.enableVertexAttribArray(vColor);
+	
+	//setup Normals
+	
+	var normalBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, cubeNormals, gl.STATIC_DRAW);
+	
+	var vNormal = gl.getAttribLocation(program, "vNormal");
+	gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
+	gl.enableVertexAttribArray(vNormal);
 
 	// Set model matrix
 
@@ -226,8 +277,9 @@ window.onload = function init()
 
 	modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
 	gl.uniformMatrix4fv(modelMatrixLoc, false, modelMatrix);
+	
 
-  // Set projection matrix
+	// Set projection matrix
 	projectionMatrix = mat4.create();
 	mat4.perspective(projectionMatrix, Math.PI * 0.25, canvas.width / canvas.height, 0.5, 100);
 
@@ -239,12 +291,24 @@ window.onload = function init()
 
 function render()
 {
+	//Keyinputs per frame
 	moveEventHandling();
+	
+	//Kamerakoordinaten per frame
 	viewMatrix = mat4.create();
 	mat4.lookAt(viewMatrix, eye, target, up);
-
 	viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
 	gl.uniformMatrix4fv(viewMatrixLoc, false, viewMatrix);
+
+	//var mvMatrix;
+	//mat4.multiply(mvMatrix, viewMatrix, modelMatrix);
+	//m*v | v*m ? typsicherheit
+	//alert(mvMatrix)
+	var normalMatrix = mat4.create();
+	mat4.invert(normalMatrix, viewMatrix);
+	mat4.transpose(normalMatrix, normalMatrix);
+	normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
+	gl.uniformMatrix4fv(normalMatrixLoc, false, normalMatrix);
 
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	gl.drawArrays(gl.TRIANGLES, 0, 108/3+6);
