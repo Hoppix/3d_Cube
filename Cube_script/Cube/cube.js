@@ -13,6 +13,7 @@ var cubeColorBuffer;
 
 var modelMatrixLoc;
 var modelMatrix;
+var normalMatrix
 
 var viewMatrixLoc;
 var viewMatrix;
@@ -136,8 +137,12 @@ window.onload = function init()
 									0.0,  0.0,  1.0,
 								    0.0,  0.0,  1.0,
 									0.0,  0.0,  1.0,
+									0.0,  0.0,  1.0,
+									0.0,  0.0,  1.0,
 									
 									//Right
+									1.0,  0.0,  0.0,
+									1.0,  0.0,  0.0,
 									1.0,  0.0,  0.0,
 									1.0,  0.0,  0.0,
 									1.0,  0.0,  0.0,
@@ -147,7 +152,11 @@ window.onload = function init()
 									0.0,  0.0, -1.0,
 									0.0,  0.0, -1.0,
 									0.0,  0.0, -1.0,
+									0.0,  0.0, -1.0,
+									0.0,  0.0, -1.0,
 									//Left
+									-1.0,  0.0,  0.0,
+									-1.0,  0.0,  0.0,
 									-1.0,  0.0,  0.0,
 									-1.0,  0.0,  0.0,
 									-1.0,  0.0,  0.0,
@@ -157,7 +166,11 @@ window.onload = function init()
 									0.0,  -1.0,  0.0,
 									0.0,  -1.0,  0.0,
 									0.0,  -1.0,  0.0,
+									0.0,  -1.0,  0.0,
+									0.0,  -1.0,  0.0,
 									//Top
+									0.0,  1.0,  0.0,
+									0.0,  1.0,  0.0,
 									0.0,  1.0,  0.0,
 									0.0,  1.0,  0.0,
 									0.0,  1.0,  0.0,
@@ -166,24 +179,26 @@ window.onload = function init()
 									0.0,  1.0,  0.0,
 									0.0,  1.0,  0.0,
 									0.0,  1.0,  0.0,
+									0.0,  1.0,  0.0,
+									0.0,  1.0,  0.0,
 									0.0,  1.0,  0.0
 												]);
 
 									// Front
-	cubeColors = new Float32Array([     0, 0, 1, 1,
-									0, 0, 1, 1,
-									0, 0, 1, 1,
-									0, 0, 1, 1,
-									0, 0, 1, 1,
-									0, 0, 1, 1,
+	cubeColors = new Float32Array([ 1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
 
 									// Right
-									0, 1, 0, 1,
-									0, 1, 0, 1,
-									0, 1, 0, 1,
-									0, 1, 0, 1,
-									0, 1, 0, 1,
-									0, 1, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
 
 									// Back
 									1, 0, 0, 1,
@@ -194,35 +209,35 @@ window.onload = function init()
 									1, 0, 0, 1,
 
 									// Left
-									1, 1, 0, 1,
-									1, 1, 0, 1,
-									1, 1, 0, 1,
-									1, 1, 0, 1,
-									1, 1, 0, 1,
-									1, 1, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
 
 									// Bottom
-									1, 0, 1, 1,
-									1, 0, 1, 1,
-									1, 0, 1, 1,
-									1, 0, 1, 1,
-									1, 0, 1, 1,
-									1, 0, 1, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
 
 									// Top
-									0, 1, 1, 1,
-									0, 1, 1, 1,
-									0, 1, 1, 1,
-									0, 1, 1, 1,
-									0, 1, 1, 1,
-									0, 1, 1, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
+									1, 0, 0, 1,
 
-									0, 0, 0, 1,
-									0, 0, 0, 1,
-								    0, 0, 0, 1,
-									0, 0, 0, 1,
-									0, 0, 0, 1,
-									0, 0, 0, 1,
+									0, 0, 1, 1,
+									0, 0, 1, 1,
+								    0, 0, 1, 1,
+									0, 0, 1, 1,
+									0, 0, 1, 1,
+									0, 0, 1, 1,
 								]);
 
 	// Configure viewport
@@ -304,10 +319,11 @@ function render()
 	//mat4.multiply(mvMatrix, viewMatrix, modelMatrix);
 	//m*v | v*m ? typsicherheit
 	//alert(mvMatrix)
-	var normalMatrix = mat4.create();
+	
+	normalMatrix = mat4.create();
 	mat4.invert(normalMatrix, viewMatrix);
 	mat4.transpose(normalMatrix, normalMatrix);
-	normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
+	var normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
 	gl.uniformMatrix4fv(normalMatrixLoc, false, normalMatrix);
 
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
