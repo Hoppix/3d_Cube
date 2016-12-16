@@ -314,7 +314,7 @@ function render()
 	mat4.lookAt(viewMatrix, eye, target, up);
 	viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
 	gl.uniformMatrix4fv(viewMatrixLoc, false, viewMatrix);
-
+	
 	//var mvMatrix;
 	//mat4.multiply(mvMatrix, viewMatrix, modelMatrix);
 	//m*v | v*m ? typsicherheit
