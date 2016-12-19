@@ -277,9 +277,7 @@ function setupMouseLock()
 function setLook(e)
 {
 	var korrektur = -0.0033;
-//if abfragen für 4 quadranten.
 	vec3.rotateY(target, target, eye, e.movementX*korrektur);
-	//vec3.rotateX(target, target, eye, e.movementY*korrektur);
 }
 
 
