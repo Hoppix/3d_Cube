@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<link rel="stylesheet" href="pretty.css">
+		<title>Webgl Cube</title>
+
+		<script id="vertex-shader" type="x-shader/x-vertex">
+			attribute vec4 vPosition;
+			attribute vec4 vColor;
+			attribute vec3 vNormal;
+
+			uniform mat4 modelMatrix;
+			uniform mat4 viewMatrix;
+			uniform mat4 projectionMatrix;
+			uniform mat4 normalMatrix;
+
+			varying vec3 vLighting;
+
+			varying vec4 fColor;
+			void main()
+			{
+				fColor = vColor;
+				gl_Position = projectionMatrix * viewMatrix * modelMatrix * vPosition;
+
+				//Aufsetzen der Lichtvektoren
+				vec3 ambientLight = vec3(0.2, 0.2, 0.2);
+				vec3 directionalLightColor = vec3(0.5, 0.5, 0.5);
+				vec3 directionalVector = vec3(-1.2, 2.0, 4.0);
+				vec3 diffLight = vec3(0.0, 0.0, 0.0);
+				vec3 vEye = vec3(viewMatrix[0]);
+
+				//Phong-Gleichung mit einer Lichtquelle
+				vLighting = ambientLight + (diffLight * max(directionalVector * vNormal, 0.0))
+				+ directionalLightColor * pow(max(dot(directionalVector, vEye) * 2.0, 0.0), 3.0);
+
+
+			}
+		</script>
+		<script id="fragment-shader" type="x-shader/x-fragment">
+			precision mediump float;
+
+			varying vec4 fColor;
+			varying vec3 vLighting;
+
+			void main()
+			{
+				gl_FragColor = fColor;
+				gl_FragColor = vec4(fColor.rgb * vLighting, fColor.a);
+			}
+		</script>
+
+		<script type="text/javascript" src="../Common/webgl-utils.js">
+		</script>
+		<script type="text/javascript" src="../Common/initShaders.js">
+		</script>
+		<script type="text/javascript" src="../Common/gl-matrix.js">
+		</script>
+		<script type="text/javascript" src="/Cube_script/Cube/arrays.js">
+		</script>
+		<script type="text/javascript" src="Cube_script/Cube/cube.js">
+		</script>
+	</head>
+	<body>
+		<div style="text-align: center;">
+		<span style="display:inline-block;padding:5px;border:5px solid;border-radius: 6px;font-size:140%;font-weight:bold;background: white;">
+		3D-Objects with webGL
+		</span>
+		</div>
+		<canvas id="gl-canvas" width="640" height="360" style="z-index: 1;">
+			If you see this, your browser doesn't support WebGL.
+		</canvas>
+		<div style="text-align: center;">
+		<span style="display:inline-block;padding:5px;border:5px solid ;border-radius: 6px;font-size:140%;font-weight:bold;background: white;">
+		Controls:<br>
+		WASD: Movement - Mouse: Lookaround
+		</span>
+		</div>
+		<button type="button" onclick="goFullScreen();" >Fullscreen!</button><br>
+	</body>
+</html>
