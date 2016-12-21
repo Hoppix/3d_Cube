@@ -2,7 +2,6 @@
 var cubePositions;
 var cubeColors;
 var cubeNormals;
-
 	// Specify position and color of the vertices
 
 cubePositions = new Float32Array(

@@ -37,6 +37,8 @@ target_x = 0.0;
 target_y = 0.0;
 target_z = 0.0;
 
+
+
 //Setzen der Werte
 eye = vec3.fromValues(eye_x, eye_y, eye_z);
 target = vec3.fromValues(target_x, target_y, target_z);
