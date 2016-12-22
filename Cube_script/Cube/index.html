@@ -15,21 +15,38 @@
 			uniform mat4 projectionMatrix;
 			uniform mat4 normalMatrix;
 
+			varying vec3 vLighting;
 			varying vec4 fColor;
+			
 			void main()
 			{			
 				fColor = vColor;
 				gl_Position = projectionMatrix * viewMatrix * modelMatrix * vPosition;
+
+				//Aufsetzen der Lichtvektoren
+				vec3 ambientLight = vec3(0.2, 0.2, 0.2);
+				vec3 directionalLightColor = vec3(0.5, 0.5, 0.5);
+				vec3 directionalVector = vec3(-1.2, 2.0, 4.0);
+				vec3 diffLight = vec3(0.0, 0.0, 0.0);
+				vec3 vEye = vec3(viewMatrix[0]);
+
+				//Phong-Gleichung mit einer Lichtquelle
+				vLighting = ambientLight + (diffLight * max(directionalVector * vNormal, 0.0))
+				+ directionalLightColor * pow(max(dot(directionalVector, vEye) * 2.0, 0.0), 3.0);
+
+
 			}
 		</script>
 		<script id="fragment-shader" type="x-shader/x-fragment">
 			precision mediump float;
 
 			varying vec4 fColor;
+			varying vec3 vLighting;
 
 			void main()
 			{
 				gl_FragColor = fColor;
+				gl_FragColor = vec4(fColor.rgb * vLighting, fColor.a);
 			}
 		</script>
 
@@ -39,11 +56,9 @@
 		</script>
 		<script type="text/javascript" src="../Common/gl-matrix.js">
 		</script>
+		<script type="text/javascript" src="arrays.js">
+		</script>
 		<script type="text/javascript" src="cube.js">
-		</script>
-		<script type="text/javascript" scr="objects.js">
-		</script>
-		<script type="text/javscript" scr="functions.js">
 		</script>
 	</head>
 	<body>
@@ -62,7 +77,5 @@
 		</span>
 		</div>
 		<button type="button" onclick="goFullScreen();" >Fullscreen!</button><br>
-		<a href="http://www.github.com/Hoppix/3d_Cube"> @Github </a>
-
 	</body>
 </html>
