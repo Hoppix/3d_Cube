@@ -33,7 +33,7 @@
 				//Phong-Gleichung mit einer Lichtquelle
 				vLighting = ambientLight + (diffLight * max(directionalVector * vNormal, 0.0))
 				+ directionalLightColor * pow(max(dot(directionalVector, vEye) * 2.0, 0.0), 3.0);
-
+                                //interpolieren
 
 			}
 		</script>
